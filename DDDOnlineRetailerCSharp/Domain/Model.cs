@@ -19,7 +19,7 @@ public class OutOfStock : Exception
 
 public record OrderLine(string OrderId, string Sku, int Qty);
 
-public class Batch(string? reference, string? sku, DateTime? eta, int purchasedQuantity)
+public class Batch(string? reference, string? sku, int purchasedQuantity, DateTime? eta = null)
 {
     public string? Reference => _reference;
 
@@ -40,7 +40,7 @@ public class Batch(string? reference, string? sku, DateTime? eta, int purchasedQ
     public int AllocatedQuantity => Allocations.Sum(ol => ol.Qty);
     public int AvailableQuantity => PurchasedQuantity - AllocatedQuantity;
 
-    public bool CanAllocate(OrderLine line) => Sku == line.Sku && PurchasedQuantity == line.Qty;
+    public bool CanAllocate(OrderLine line) => Sku == line.Sku && PurchasedQuantity >= line.Qty;
 
     public void Allocate(OrderLine line)
     {
