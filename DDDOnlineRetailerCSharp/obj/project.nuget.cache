@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "TCGW8AoPsfOjcp+uA2b2G+VPoCASXDeyaywMt3kEx4DTN73BttiooVJiUiSWa8b8VZrKoysRa0P3ZNiOKsuSaw==",
+  "success": true,
+  "projectFilePath": "G:\\maleki_code\\csharp\\Learning\\DDDOnlineRetailerCSharp\\DDDOnlineRetailerCSharp\\DDDOnlineRetailerCSharp.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1803",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "You are running the 'restore' operation with an 'HTTP' source, 'http://repository.ismc.ir/artifactory/api/nuget/nuget'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
+    }
+  ]
+}
