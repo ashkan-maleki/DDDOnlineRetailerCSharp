@@ -1,18 +1,11 @@
 using DDDOnlineRetailerCSharp.Domain;
 using FluentAssertions;
 
-namespace DDDOnlineRetailerCSharpTest.Unit;
-
-
+namespace DDDOnlineRetailerCSharp.Test.Unit;
 
 public class UnitTestBatches
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
-    [Test]
+    [Fact]
     public void TestAllocatingToABatchReducesTheAvailableQuantity()
     {
         Batch batch = new("batch-001", "SMALL-TABLE", 20, eta: DateTime.Today);
@@ -30,14 +23,14 @@ public class UnitTestBatches
         (new("batch-001", sku, batchQty, eta: DateTime.Today),
             new("order-123", sku, lineQty));
 
-    [Test]
+    [Fact]
     public void TestCanAllocateIfAvailableGreaterThanRequired()
     {
         (Batch batch, OrderLine ol) = MakeBatchAndLine("ELEGANT-LAMP", 20, 2);
         batch.CanAllocate(ol).Should().BeTrue();
     }
     
-    [Test]
+    [Fact]
     public void TestCannotAllocateIfAvailableSmallThanRequired()
     {
         (Batch batch, OrderLine ol) = MakeBatchAndLine("ELEGANT-LAMP", 2, 20);
@@ -46,19 +39,20 @@ public class UnitTestBatches
         // arrange
         Batch batch1 = new("batch1", "ELEGANT-LAMP", 10, eta: DateTime.Today);
         // act
-        Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
+        Domain.Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
         batch1.AvailableQuantity.Should().Be(0);
         batch1.CanAllocate(new OrderLine("order2", "ELEGANT-LAMP", 1)).Should().BeFalse();
+        
     }
 
-    [Test]
+    [Fact]
     public void TestCanAllocateIfAvailableEqualToRequired()
     {
         (Batch batch, OrderLine ol) = MakeBatchAndLine("ELEGANT-LAMP", 2, 2);
         batch.CanAllocate(ol).Should().BeTrue();
     }
     
-    [Test]
+    [Fact]
     public void TestCannotAllocateIfSkusDoNotMatch()
     {
         Batch batch = new("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta: null);
@@ -66,7 +60,7 @@ public class UnitTestBatches
         batch.CanAllocate(differentSkuLine).Should().BeFalse();
     }
     
-    [Test]
+    [Fact]
     public void TestCanOnlyDeallocateAllocatedLines()
     {
         (Batch batch, OrderLine unallocatedLine) = MakeBatchAndLine("DECORATIVE-TRINKET", 20, 2);
