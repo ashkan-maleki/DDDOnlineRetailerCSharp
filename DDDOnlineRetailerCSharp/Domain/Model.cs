@@ -2,21 +2,31 @@
 
 
 
-public record OrderLine(string OrderId, string Sku, int Qty);
+public class OrderLine(string orderId, string sku, int qty)
+{
+    public string OrderId { get; init; } = orderId;
+    public string Sku { get; init; } = sku;
+    public int Qty { get; init; } = qty;
+
+    public void Deconstruct(out string OrderId, out string Sku, out int Qty)
+    {
+        OrderId = this.OrderId;
+        Sku = this.Sku;
+        Qty = this.Qty;
+    }
+}
 
 public class Batch(string? reference, string? sku, int purchasedQuantity, DateTime? eta = null) : IComparable<Batch>
 {
-    private string? _sku = sku;
-    private DateTime? _eta = eta;
-    private int _purchasedQuantity = purchasedQuantity;
-    private List<OrderLine> _allocations = new();
-    private readonly string? _reference = reference;
-    
-    
-    public string? Reference => _reference;
-    public string? Sku => _sku;
-    public DateTime? Eta => _eta;
-    public int PurchasedQuantity => _purchasedQuantity;
+    private readonly List<OrderLine> _allocations = new();
+    public string? Reference { get; } = reference;
+
+    public string? Sku { get; } = sku;
+
+    public DateTime? Eta { get; } = eta;
+
+    public int PurchasedQuantity { get; } = purchasedQuantity;
+
     public List<OrderLine> Allocations => _allocations;
     public int AllocatedQuantity => Allocations.Sum(ol => ol.Qty);
     public int AvailableQuantity => PurchasedQuantity - AllocatedQuantity;
