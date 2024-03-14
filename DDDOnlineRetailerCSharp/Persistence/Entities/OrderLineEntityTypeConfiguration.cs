@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DDDOnlineRetailerCSharp.Persistence.Entities;
 
-public class BatchEntityTypeConfiguration : IEntityTypeConfiguration<Batch>
+public class OrderLineEntityTypeConfiguration : IEntityTypeConfiguration<OrderLine>
 {
-    public void Configure(EntityTypeBuilder<Batch> builder)
+    public void Configure(EntityTypeBuilder<OrderLine> builder)
     {
-        builder.ToTable("batches").HasKey(b => b.Id);
+        builder.ToTable("order_lines").HasKey(o => o.Id);
         
         builder.Property<int>(o => o.Id);
 
-        builder.Property<string>(b => b.Reference!)
+        builder.Property<string>(o => o.OrderId!)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
@@ -20,16 +20,8 @@ public class BatchEntityTypeConfiguration : IEntityTypeConfiguration<Batch>
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
-
-        builder.Property<DateTime?>(b => b.Eta)
-            .UsePropertyAccessMode(PropertyAccessMode.Field)
-            .IsRequired(false);
-
-        builder.Property<int>(b => b.PurchasedQuantity)
+        builder.Property<int>(b => b.Qty)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
-
-        builder.HasMany(b => b.Allocations).WithMany();
-
     }
 }
