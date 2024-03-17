@@ -2,7 +2,7 @@
 using DDDOnlineRetailerCSharp.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace DDDOnlineRetailerCSharp.Link;
+namespace DDDOnlineRetailerCSharp.Link.Adaptors;
 
 public class Repository(RetailerDbContext dbContext) : IRepository
 {

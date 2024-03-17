@@ -1,7 +1,7 @@
 ﻿using DDDOnlineRetailerCSharp.Domain;
-using DDDOnlineRetailerCSharp.Link;
+using DDDOnlineRetailerCSharp.Link.Adaptors;
 
-namespace DDDOnlineRetailerCSharp.Presentation.Services;
+namespace DDDOnlineRetailerCSharp.Link.Services;
 
 public class InvalidSku : Exception
 {
@@ -20,11 +20,11 @@ public class InvalidSku : Exception
     }
 }
 
-public class BatchService
+public class BatchService(IRepository repo, IUnitOfWork unitOfWork)
 {
     private bool IsValidSku(string sku, List<Batch> batches) => batches.Any(b => b.Sku == sku);
 
-    public async Task<string> Allocate(OrderLine line, IRepository repo, IUnitOfWork unitOfWork)
+    public async Task<string> Allocate(OrderLine line)
     {
         List<Batch> batches = await repo.ListAsync();
         if (!IsValidSku(line.Sku, batches))

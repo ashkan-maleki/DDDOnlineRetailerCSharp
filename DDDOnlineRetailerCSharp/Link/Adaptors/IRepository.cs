@@ -1,6 +1,6 @@
 using DDDOnlineRetailerCSharp.Domain;
 
-namespace DDDOnlineRetailerCSharp.Link;
+namespace DDDOnlineRetailerCSharp.Link.Adaptors;
 
 public interface IRepository
 {

@@ -1,4 +1,4 @@
-namespace DDDOnlineRetailerCSharp.Link;
+namespace DDDOnlineRetailerCSharp.Link.Services;
 
 public interface IUnitOfWork
 {

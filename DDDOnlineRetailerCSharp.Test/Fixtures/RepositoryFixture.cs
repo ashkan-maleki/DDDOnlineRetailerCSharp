@@ -1,4 +1,6 @@
 ﻿using DDDOnlineRetailerCSharp.Link;
+using DDDOnlineRetailerCSharp.Link.Adaptors;
+using DDDOnlineRetailerCSharp.Link.Services;
 using DDDOnlineRetailerCSharp.Persistence;
 
 namespace DDDOnlineRetailerCSharp.Test.Fixtures;
