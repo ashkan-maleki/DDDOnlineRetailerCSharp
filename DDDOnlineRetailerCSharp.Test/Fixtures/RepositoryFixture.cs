@@ -10,15 +10,13 @@ public class RepositoryFixture : IDisposable
     public RepositoryFixture()
     {
         DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
-        UnitOfWork = new UnitOfWork(DbContext);
-        Repository = new Repository(DbContext);
+        
+        UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext));
     }
 
     public RetailerDbContext DbContext { get; }
 
     public IUnitOfWork UnitOfWork { get; }
-
-    public IRepository Repository { get; }
 
     public void Dispose()
     {

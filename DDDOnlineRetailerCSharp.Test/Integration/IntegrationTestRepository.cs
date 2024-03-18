@@ -1,5 +1,4 @@
 ﻿using DDDOnlineRetailerCSharp.Domain;
-using DDDOnlineRetailerCSharp.Link;
 using DDDOnlineRetailerCSharp.Persistence;
 using DDDOnlineRetailerCSharp.Test.Fixtures;
 using FluentAssertions;
@@ -14,7 +13,7 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
     {
         Batch batch = new("batch1", "RUSTY-SOAPDISH", 100);
 
-        await repositoryFixture.Repository.AddAsync(batch: batch);
+        await repositoryFixture.UnitOfWork.Repository.AddAsync(batch: batch);
         await repositoryFixture.UnitOfWork.CommitAsync();
 
         Batch got = await repositoryFixture.DbContext.Batches.FromSql($"SELECT * FROM batches").FirstAsync();
@@ -26,12 +25,12 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
     {
         RetailerDbContext dbContext = repositoryFixture.DbContext;
         
-        int orderLineID = await dataFixture.InsertOrderLine(dbContext);
-        int batch1ID = await dataFixture.InsertBatch(dbContext,"batch1");
+        int orderLineId = await dataFixture.InsertOrderLine(dbContext);
+        int batch1Id = await dataFixture.InsertBatch(dbContext,"batch1");
         await dataFixture.InsertBatch(dbContext,"batch2");
-        await dataFixture.InsertAllocation(dbContext,orderLineID, batch1ID);
+        await dataFixture.InsertAllocation(dbContext,orderLineId, batch1Id);
         
-        Batch got = await repositoryFixture.Repository.GetAsync("batch1");
+        Batch got = await repositoryFixture.UnitOfWork.Repository.GetAsync("batch1");
         Batch expected = new("batch1", "GENERIC-SOFA", 100);
         expected.Should().Be(got);
         expected.Sku.Should().Be(got.Sku);

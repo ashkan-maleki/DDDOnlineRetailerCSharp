@@ -1,7 +1,10 @@
+using DDDOnlineRetailerCSharp.Link.Adaptors;
+
 namespace DDDOnlineRetailerCSharp.Link.Services;
 
-public interface IUnitOfWork
+public interface IUnitOfWork : IAsyncDisposable
 {
-    void Commit();
-    Task CommitAsync();
+    IRepository Repository { get; }
+    int Commit();
+    Task<int> CommitAsync(CancellationToken cancellationToken = default);
 }
