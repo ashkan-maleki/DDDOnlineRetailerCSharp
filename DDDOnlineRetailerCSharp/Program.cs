@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
-builder.Services.AddDbContext<RetailerDbContext>(s=> s.UseInMemoryDatabaseOptionsBuilder());
+builder.Services.AddDbContext<RetailerDbContext>(s=> s.UseSqliteDatabaseOptionsBuilder());
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
