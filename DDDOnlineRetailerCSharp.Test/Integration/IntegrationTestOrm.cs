@@ -51,25 +51,61 @@ public class IntegrationTestOrm
         expected.Should().BeEquivalentTo(actual);
     }
 
+    // [Fact]
+    // public async Task TestRetrievingBatches()
+    // {
+    //     RetailerDbContext dbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
+    //     
+    //     await dbContext.Database.ExecuteSqlAsync($@"
+    //          INSERT INTO batches (reference, sku, purchasedquantity, eta)
+    //          VALUES ('batch1', 'sku1', 100, null);
+    //          INSERT INTO batches (reference, sku, purchasedquantity, eta)
+    //          VALUES ('batch2', 'sku2', 200, '2011-04-11');
+    //     ");
+    //     
+    //     List<Batch> expected =
+    //     [
+    //         new("batch1", "sku1", 100),
+    //         new("batch2", "sku2", 200, eta:new DateTime(2011, 4, 11))
+    //     ];
+    //     
+    //     dbContext.Batches.Count().Should().Be(expected.Count);
+    //     dbContext.Batches.ToList().Should().BeEquivalentTo(expected);
+    // }
+    
+    
     [Fact]
-    public async Task TestRetrievingBatches()
+    public async Task TestRetrievingBatchesThroughProduct()
     {
         RetailerDbContext dbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
-        
+       
+        await dbContext.Database.ExecuteSqlAsync($@"
+             INSERT INTO products (sku, versionnumber)
+             VALUES ('sku-1', 0);
+             INSERT INTO products (sku, versionnumber)
+             VALUES ('sku-2', 0);
+        ");
         await dbContext.Database.ExecuteSqlAsync($@"
              INSERT INTO batches (reference, sku, purchasedquantity, eta)
-             VALUES ('batch1', 'sku1', 100, null);
+             VALUES ('batch1', 'sku-1', 100, null);
              INSERT INTO batches (reference, sku, purchasedquantity, eta)
-             VALUES ('batch2', 'sku2', 200, '2011-04-11');
+             VALUES ('batch2', 'sku-2', 200, '2011-04-11');
+             INSERT INTO batches (reference, sku, purchasedquantity, eta)
+             VALUES ('batch3', 'sku-1', 200, '2011-04-11');
         ");
+        
+     
         
         List<Batch> expected =
         [
-            new("batch1", "sku1", 100),
-            new("batch2", "sku2", 200, eta:new DateTime(2011, 4, 11))
+            new("batch1", "sku-1", 100),
+            new("batch3", "sku-1", 200, eta:new DateTime(2011, 4, 11))
         ];
-        
-        dbContext.Batches.Count().Should().Be(expected.Count);
-        dbContext.Batches.ToList().Should().BeEquivalentTo(expected);
+
+        Product product = await dbContext.Products.Include(product => product.Batches)
+            .Where(product => product.Sku == "sku-1")
+            .FirstAsync();
+        product.Batches.Should().HaveCount(expected.Count);
+        product.Batches.Should().BeEquivalentTo(expected);
     }
 }

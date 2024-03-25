@@ -39,9 +39,11 @@ public class RetailerDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new BatchEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new OrderLineEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductEntityTypeConfiguration());
     }
 
     public DbSet<Batch> Batches { get; set; }
     public DbSet<OrderLine> OrderLines { get; set; }
+    public DbSet<Product> Products { get; set; }
 
 }

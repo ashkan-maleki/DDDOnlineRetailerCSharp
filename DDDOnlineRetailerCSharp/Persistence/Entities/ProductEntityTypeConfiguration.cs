@@ -8,15 +8,12 @@ public class ProductEntityTypeConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable("products").HasKey(o => o.Id);
+        builder.ToTable("products").HasKey(o => o.Sku);
         
-        builder.Property(o => o.Id);
+        builder.Property(o => o.Sku)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Property(o => o.VersionNumber)
-            .UsePropertyAccessMode(PropertyAccessMode.Field)
-            .IsRequired();
-
-        builder.Property<string>(b => b.Sku!)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
