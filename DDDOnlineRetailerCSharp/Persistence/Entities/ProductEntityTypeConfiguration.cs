@@ -15,6 +15,7 @@ public class ProductEntityTypeConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(o => o.VersionNumber)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .IsConcurrencyToken()
             .IsRequired();
 
         builder.HasMany(product => product.Batches)
