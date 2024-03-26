@@ -5,7 +5,10 @@ namespace DDDOnlineRetailerCSharp.Test.Fixtures;
 
 public class DataFixture : IDisposable
 {
-    const string Sku = "GENERIC-SOFA";
+    private const string Sku = "GENERIC-SOFA";
+    
+    
+    public string GetSku => Sku;
 
     public async Task<int> InsertOrderLine(RetailerDbContext dbContext)
     {
@@ -30,6 +33,14 @@ public class DataFixture : IDisposable
         int id = await dbContext.OrderLines.FromSql($"SELECT id FROM batches WHERE reference={reference} AND sku={Sku}")
             .Select(line => line.Id).FirstAsync();
         return id;
+    }
+    
+    public async Task InsertProduct(RetailerDbContext dbContext)
+    {
+        await dbContext.Database.ExecuteSqlAsync($@"
+            INSERT INTO products (sku, versionnumber) VALUES
+            ({Sku}, 1)
+            ");
     }
 
     public async Task InsertAllocation(RetailerDbContext dbContext, int batchId, int orderlineId) =>

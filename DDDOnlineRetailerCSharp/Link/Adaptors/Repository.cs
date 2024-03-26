@@ -6,9 +6,10 @@ namespace DDDOnlineRetailerCSharp.Link.Adaptors;
 
 public class Repository(RetailerDbContext dbContext) : IRepository
 {
-    public async Task AddAsync(Batch batch) => await dbContext.Batches.AddAsync(batch);
+    public async Task AddAsync(Product product) => await dbContext.Products.AddAsync(product);
 
-    public async Task<Batch> GetAsync(string reference) => await dbContext.Batches.Include(b=> b.Allocations).FirstAsync(b => b.Reference == reference);
-
-    public async Task<List<Batch>> ListAsync() => await dbContext.Batches.Include(b=> b.Allocations).ToListAsync();
+    public async Task<Product> GetAsync(string sku) => await dbContext.Products
+        .Include(product => product.Batches)
+        .ThenInclude(batch => batch.Allocations)
+        .FirstAsync(product => product.Sku == sku);
 }

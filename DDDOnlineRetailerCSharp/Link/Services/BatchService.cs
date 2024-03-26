@@ -26,15 +26,16 @@ public class BatchService(IUnitOfWork uow)
 
     public async Task AddBatch(Batch batch)
     {
-        await uow.Repository.AddAsync(batch);
+        // await uow.Repository.AddAsync(batch);
         await uow.CommitAsync();
-        List<Batch> batches = await uow.Repository.ListAsync();
-        string a = "";
+        // List<Batch> batches = await uow.Repository.ListAsync();
+        
     }
 
     public async Task<string> Allocate(OrderLine line)
     {
-        List<Batch> batches = await uow.Repository.ListAsync();
+        // List<Batch> batches = await uow.Repository.ListAsync();
+        List<Batch> batches = new List<Batch>();
         if (!IsValidSku(line.Sku, batches))
         {
             throw new InvalidSku($"Invalid sku {line.Sku}");
