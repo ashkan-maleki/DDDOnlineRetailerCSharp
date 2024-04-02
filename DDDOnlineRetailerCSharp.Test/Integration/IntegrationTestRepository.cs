@@ -35,7 +35,7 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
         await dataFixture.InsertBatch(dbContext,"batch2");
         await dataFixture.InsertAllocation(dbContext,orderLineId, batch1Id);
 
-        Product product = await repositoryFixture.UnitOfWork.Repository.GetAsync(dataFixture.GetSku);
+        Product? product = await repositoryFixture.UnitOfWork.Repository.GetAsync(dataFixture.GetSku);
         Batch got = product.Batches.First(batch => batch.Reference == reference);
         Batch expected = new(reference, dataFixture.GetSku, 100);
         List<OrderLine> expectedLine = new() { new("order1", dataFixture.GetSku, 12) };
