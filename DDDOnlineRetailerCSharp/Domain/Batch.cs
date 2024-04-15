@@ -23,7 +23,7 @@ public class Batch(string? reference, string? sku, int purchasedQuantity, DateTi
     public bool CanAllocate(OrderLine line) => Sku == line.Sku && AvailableQuantity >= line.Qty;
     public void Allocate(OrderLine line)
     {
-        if (CanAllocate(line))
+        if (CanAllocate(line) && !_allocations.Contains(line))
         {
             _allocations.Add(line);
         }

@@ -15,6 +15,7 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
         
         Batch batch = new("batch1", sku, 100);
         Product product = new(sku, new List<Batch>() {batch});
+        
 
         await repositoryFixture.UnitOfWork.Repository.AddAsync(product: product);
         await repositoryFixture.UnitOfWork.CommitAsync();
@@ -29,10 +30,10 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
         RetailerDbContext dbContext = repositoryFixture.DbContext;
 
         await dataFixture.InsertProduct(dbContext);
-        int orderLineId = await dataFixture.InsertOrderLine(dbContext);
         string reference = "batch1";
         int batch1Id = await dataFixture.InsertBatch(dbContext,reference);
         await dataFixture.InsertBatch(dbContext,"batch2");
+        int orderLineId = await dataFixture.InsertOrderLine(dbContext);
         await dataFixture.InsertAllocation(dbContext,orderLineId, batch1Id);
 
         Product? product = await repositoryFixture.UnitOfWork.Repository.GetAsync(dataFixture.GetSku);

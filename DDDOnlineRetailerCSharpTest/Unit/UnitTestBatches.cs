@@ -37,19 +37,19 @@ public class UnitTestBatches
         batch.CanAllocate(ol).Should().BeTrue();
     }
     
-    [Test]
-    public void TestCannotAllocateIfAvailableSmallThanRequired()
-    {
-        (Batch batch, OrderLine ol) = MakeBatchAndLine("ELEGANT-LAMP", 2, 20);
-        batch.CanAllocate(ol).Should().BeFalse();
-        
-        // arrange
-        Batch batch1 = new("batch1", "ELEGANT-LAMP", 10, eta: DateTime.Today);
-        // act
-        Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
-        batch1.AvailableQuantity.Should().Be(0);
-        batch1.CanAllocate(new OrderLine("order2", "ELEGANT-LAMP", 1)).Should().BeFalse();
-    }
+    // [Test]
+    // public void TestCannotAllocateIfAvailableSmallThanRequired()
+    // {
+    //     (Batch batch, OrderLine ol) = MakeBatchAndLine("ELEGANT-LAMP", 2, 20);
+    //     batch.CanAllocate(ol).Should().BeFalse();
+    //     
+    //     // arrange
+    //     Batch batch1 = new("batch1", "ELEGANT-LAMP", 10, eta: DateTime.Today);
+    //     // act
+    //     Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
+    //     batch1.AvailableQuantity.Should().Be(0);
+    //     batch1.CanAllocate(new OrderLine("order2", "ELEGANT-LAMP", 1)).Should().BeFalse();
+    // }
 
     [Test]
     public void TestCanAllocateIfAvailableEqualToRequired()

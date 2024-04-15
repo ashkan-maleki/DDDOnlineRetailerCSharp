@@ -20,7 +20,7 @@ public class InvalidSku : Exception
     }
 }
 
-public class BatchService(IUnitOfWork uow)
+public class ProductService(IUnitOfWork uow)
 {
     private bool IsValidSku(string sku, List<Batch> batches) => batches.Any(b => b.Sku == sku);
 
@@ -46,7 +46,7 @@ public class BatchService(IUnitOfWork uow)
         {
             throw new InvalidSku($"Invalid sku {line.Sku}");
         }
-
+        
         string batchRef = product.Allocate(line);
         await uow.CommitAsync();
         return batchRef;

@@ -9,7 +9,7 @@ namespace DDDOnlineRetailerCSharp.Controllers;
 [Route("api/")]
 public class IndexController(IUnitOfWork uow) : ControllerBase
 {
-    private readonly BatchService _service = new (uow);
+    private readonly ProductService _service = new (uow);
 
     [HttpPost("add_batch")]
     public async Task<IActionResult> AddBatch([FromBody] Batch batch)
@@ -26,7 +26,7 @@ public class IndexController(IUnitOfWork uow) : ControllerBase
             string batchRef = await _service.Allocate(line);
             return StatusCode(201, batchRef);
         }
-        catch (OutOfStock e)
+        catch (InvalidSku e)
         {
             return BadRequest(e.Message);
         }

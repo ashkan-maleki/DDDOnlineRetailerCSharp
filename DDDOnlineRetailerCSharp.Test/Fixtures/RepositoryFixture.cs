@@ -11,7 +11,7 @@ public class RepositoryFixture : IDisposable
     {
         DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
         
-        UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext));
+        UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext), new MessageBus());
     }
 
     public RetailerDbContext DbContext { get; }

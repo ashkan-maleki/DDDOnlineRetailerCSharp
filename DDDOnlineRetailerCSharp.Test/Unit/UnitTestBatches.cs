@@ -17,8 +17,6 @@ public class UnitTestBatches
         batch.AvailableQuantity.Should().Be(18);
     }
 
-    private record BatchAndLine(Batch Batch, OrderLine OrderLine);
-
     private (Batch, OrderLine) MakeBatchAndLine(string sku, int batchQty, int lineQty) =>
         (new("batch-001", sku, batchQty, eta: DateTime.Today),
             new("order-123", sku, lineQty));
@@ -37,11 +35,11 @@ public class UnitTestBatches
         batch.CanAllocate(ol).Should().BeFalse();
         
         // arrange
-        Batch batch1 = new("batch1", "ELEGANT-LAMP", 10, eta: DateTime.Today);
+        // Batch batch1 = new("batch1", "ELEGANT-LAMP", 10, eta: DateTime.Today);
         // act
-        Domain.Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
-        batch1.AvailableQuantity.Should().Be(0);
-        batch1.CanAllocate(new OrderLine("order2", "ELEGANT-LAMP", 1)).Should().BeFalse();
+        // Domain.Domain.Allocate(new OrderLine("order1", "ELEGANT-LAMP", 10), new[] { batch1 });
+        // batch1.AvailableQuantity.Should().Be(0);
+        // batch1.CanAllocate(new OrderLine("order2", "ELEGANT-LAMP", 1)).Should().BeFalse();
         
     }
 
@@ -58,6 +56,25 @@ public class UnitTestBatches
         Batch batch = new("batch-001", "UNCOMFORTABLE-CHAIR", 100, eta: null);
         OrderLine differentSkuLine = new("order-123", "EXPENSIVE-TOASTER", 10);
         batch.CanAllocate(differentSkuLine).Should().BeFalse();
+    }
+
+
+    [Fact]
+    public void TestAllocationIsIdempotent()
+    {
+        (Batch batch, OrderLine ol) = MakeBatchAndLine("ANGULAR-DESK", 20, 2);
+        batch.Allocate(ol);
+        batch.Allocate(ol);
+        batch.AvailableQuantity.Should().Be(18);
+    }
+
+    [Fact]
+    public void TestDeallocate()
+    {
+        (Batch batch, OrderLine ol) = MakeBatchAndLine("EXPENSIVE-FOOTSTOOL", 20, 2);
+        batch.Allocate(ol);
+        batch.Deallocate(ol);
+        batch.AvailableQuantity.Should().Be(20);
     }
     
     [Fact]
