@@ -12,13 +12,12 @@ public class UnitOfWork(RetailerDbContext dbContext, IRepository repository, IMe
     public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
     {
         int commit = await dbContext.SaveChangesAsync(cancellationToken);
-        await PublishEvents();
         return commit;
     }
 
     public async ValueTask DisposeAsync() => await dbContext.DisposeAsync();
 
-    private async Task PublishEvents()
+    public async IAsyncEnumerable<Task<Event>> CollectNewEvents()
     {
         foreach (Product product in repository.Seen)
         {
@@ -28,8 +27,9 @@ public class UnitOfWork(RetailerDbContext dbContext, IRepository repository, IMe
                 if (@event == null)
                 {
                     break;
-                } 
-                await messageBus.HandleAsync(@event);
+                }
+
+                yield return Task.FromResult(@event);
             }
         }
     }
