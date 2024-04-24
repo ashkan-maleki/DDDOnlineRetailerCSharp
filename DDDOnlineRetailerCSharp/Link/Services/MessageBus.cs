@@ -6,13 +6,15 @@ namespace DDDOnlineRetailerCSharp.Link.Services;
 public interface IMessageBus
 {
     void RegisterHandler<T>(Func<T, Task> handler) where T : Event;
-    Task HandleAsync(Event @event);
+    void RegisterHandler<T>(Func<T, Task<object>> handler) where T : Event;
+    Task<Queue<object>> HandleAsync(Event @event);
 }
 
 // EventHandler
-public class MessageBus : IMessageBus
+public class MessageBus(IUnitOfWork uow) : IMessageBus
 {
     private readonly Dictionary<Type, Func<Event, Task>> _handlers = new();
+    private readonly Dictionary<Type, Func<Event, Task<object>>> _genericHandlers = new();
 
     public void RegisterHandler<T>(Func<T, Task> handler) where T : Event
     {
@@ -20,27 +22,87 @@ public class MessageBus : IMessageBus
         {
             throw new IndexOutOfRangeException("You cannot register the same event handler twice");
         }
+
         _handlers.Add(typeof(T), x => handler((T)x));
     }
 
-    public async Task HandleAsync(Event @event)
+    public void RegisterHandler<T>(Func<T, Task<object>> handler) where T : Event  
     {
-        if (_handlers.TryGetValue(@event.GetType(), out Func<Event, Task> handler))
+        if (_genericHandlers.ContainsKey(typeof(T)))
         {
-            await handler(@event);
+            throw new IndexOutOfRangeException("You cannot register the same event handler twice");
         }
 
-        throw new ArgumentNullException(nameof(handler), "No event handler was registered");
+        _genericHandlers.Add(typeof(T), x => handler((T)x));
+        
+    }
+
+    // public async Task HandleAsync(Event @event)
+    // {
+    //     Queue<Event> events = new Queue<Event>(new[] { @event });
+    //     while (events.Any())
+    //     {
+    //         @event = events.Dequeue();
+    //         if (_handlers.TryGetValue(@event.GetType(), out Func<Event, Task>? handler))
+    //         {
+    //             await handler(@event);
+    //             await foreach (var collectedEvent in  uow.CollectNewEvents())
+    //             {
+    //                 events.Enqueue(collectedEvent.Result);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             throw new ArgumentNullException(nameof(handler), "No event handler was registered");
+    //         }
+    //     } ;
+    // }
+    
+    public async Task<Queue<object>> HandleAsync(Event @event)
+    {
+        Queue<Event> events = new Queue<Event>(new[] { @event });
+        Queue<object> results = new();
+        while (events.Any())
+        {
+            @event = events.Dequeue();
+            if (_genericHandlers.TryGetValue(@event.GetType(), out Func<Event, Task<object>>? genHandler))
+            {
+                results.Enqueue(await genHandler(@event));
+                
+                await foreach (var collectedEvent in  uow.CollectNewEvents())
+                {
+                    events.Enqueue(collectedEvent.Result);
+                }
+            } else if (_handlers.TryGetValue(@event.GetType(), out Func<Event, Task>? handler))
+            {
+                await handler(@event);
+                
+                await foreach (var collectedEvent in  uow.CollectNewEvents())
+                {
+                    events.Enqueue(collectedEvent.Result);
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(handler), "No event handler was registered");
+            }
+        }
+
+        return results;
     }
 }
 
-
 public static class MessageBusFactory
 {
-    public static MessageBus RegisterAll(IEventHandler handler)
+    public static MessageBus RegisterAll(IEventHandler handler, IUnitOfWork uow)
     {
-        MessageBus messageBus = new();
+        MessageBus messageBus = new(uow);
+        messageBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
+        messageBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
         messageBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
+        
+        
+        messageBus.RegisterHandler<AllocationRequired>(handler.HandleAsync);
         return messageBus;
     }
 }

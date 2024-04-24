@@ -4,7 +4,7 @@ using DDDOnlineRetailerCSharp.Persistence;
 
 namespace DDDOnlineRetailerCSharp.Link.Services;
 
-public class UnitOfWork(RetailerDbContext dbContext, IRepository repository, IMessageBus messageBus) : IUnitOfWork
+public class UnitOfWork(RetailerDbContext dbContext, IRepository repository) : IUnitOfWork
 {
     public IRepository Repository { get; } = repository;
     public int Commit() => dbContext.SaveChanges();

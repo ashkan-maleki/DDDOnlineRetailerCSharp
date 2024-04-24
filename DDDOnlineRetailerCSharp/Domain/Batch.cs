@@ -9,7 +9,7 @@ public class Batch(string? reference, string? sku, int purchasedQuantity, DateTi
 
     public DateTime? Eta { get; } = eta;
 
-    public int PurchasedQuantity { get; } = purchasedQuantity;
+    public int PurchasedQuantity { get; private set; } = purchasedQuantity;
 
     public int Id { get; protected init; }
 
@@ -34,6 +34,11 @@ public class Batch(string? reference, string? sku, int purchasedQuantity, DateTi
         {
             _allocations.Remove(line);
         }
+    }
+
+    public void SetPurchasedQuantity(int qty)
+    {
+        PurchasedQuantity = qty;
     }
 
 
@@ -85,5 +90,16 @@ public class Batch(string? reference, string? sku, int purchasedQuantity, DateTi
         return lhs.Eta > rhs.Eta;
     }
     public static bool operator <(Batch lhs, Batch rhs) => rhs > lhs;
-    public static bool operator !=(Batch lhs, Batch rhs) => !(lhs == rhs);
+    public static bool operator !=(Batch? lhs, Batch? rhs) => !(lhs == rhs);
+
+    public OrderLine? DeallocateOne()
+    {
+        OrderLine? orderLine = _allocations.FirstOrDefault();
+        if (orderLine != null)
+        {
+            _allocations.Remove(orderLine);
+        }
+
+        return orderLine;
+    }
 }

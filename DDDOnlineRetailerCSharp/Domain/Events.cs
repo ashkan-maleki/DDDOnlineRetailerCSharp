@@ -31,6 +31,12 @@ public record BatchCreated(string Reference, string Sku, int Qty, DateTime? Eta 
     public DateTime? Eta { get; init; } = Eta;
 }
 
+public record BatchQuantityChanged(string Reference, int Qty) : Event
+{
+    public string Reference { get; init; } = Reference;
+    public int Qty { get; init; } = Qty;
+}
+
 public record AllocationRequired(string OrderId, string Sku, int Qty) : Event
 {
     public string OrderId { get; init; } = OrderId;

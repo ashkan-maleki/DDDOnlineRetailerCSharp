@@ -17,8 +17,11 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 IEventHandler eventHandler = builder!.Services!.BuildServiceProvider()
     .GetRequiredService<IEventHandler>();
 
+IUnitOfWork uow = builder!.Services!.BuildServiceProvider()
+    .GetRequiredService<IUnitOfWork>();
 
-MessageBus messageBus = MessageBusFactory.RegisterAll(eventHandler);
+
+MessageBus messageBus = MessageBusFactory.RegisterAll(eventHandler, uow);
 builder.Services.AddSingleton<IMessageBus>(_ => messageBus);
 
 var app = builder.Build();

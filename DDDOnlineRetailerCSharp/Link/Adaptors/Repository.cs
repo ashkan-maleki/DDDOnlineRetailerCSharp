@@ -26,4 +26,19 @@ public class Repository(RetailerDbContext dbContext) : IRepository
         }
         return product;
     }
+
+    public async Task<Product?> GetByBatchRef(string reference)
+    {
+        Product? product = await dbContext.Products
+            .Include(product => product.Batches)
+            .ThenInclude(batch => batch.Allocations)
+            .Where(prodcut => prodcut.Batches.Any(batch => batch.Reference == reference))
+            .FirstOrDefaultAsync();
+        if (product != null)
+        {
+            Seen.Add(product);
+        }
+
+        return product;
+    }
 }

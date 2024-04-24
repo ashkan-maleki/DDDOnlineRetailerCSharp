@@ -55,4 +55,22 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
         VersionNumber++;
         return batch.Reference!;
     }
+
+    public void ChangeBatchQuantity(string reference, int qty)
+    {
+        Batch? batch = Batches.FirstOrDefault(b => b.Reference == reference);
+        if (batch != null)
+        {
+            batch.SetPurchasedQuantity(qty);
+            while (batch.AvailableQuantity < 0)
+            {
+                OrderLine? line = batch.DeallocateOne();
+                if (line == null)
+                {
+                    break;
+                }
+                _events.Add(new AllocationRequired(line.OrderId, line.Sku, line.Qty));
+            }
+        }
+    }
 }

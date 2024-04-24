@@ -6,7 +6,8 @@ public interface IEventHandler
 {
     public Task HandleAsync(OutOfStock @event);
     public Task HandleAsync(BatchCreated @event);
-    public Task HandleAsync(AllocationRequired @event);
+    public Task HandleAsync(BatchQuantityChanged @event);
+    public Task<object> HandleAsync(AllocationRequired @event);
     
 }
 
@@ -31,7 +32,17 @@ public class EventHandler(IEmailService emailService, IUnitOfWork uow) : IEventH
         await uow.CommitAsync();
     }
 
-    public async Task HandleAsync(AllocationRequired @event)
+    public async Task HandleAsync(BatchQuantityChanged @event)
+    {
+        Product? product = await uow.Repository.GetByBatchRef(@event.Reference);
+        if (product != null)
+        {
+            product.ChangeBatchQuantity(@event.Reference, @event.Qty);
+            await uow.CommitAsync();
+        }
+    }
+
+    public async Task<object> HandleAsync(AllocationRequired @event)
     {
         OrderLine line = new(@event.OrderId, @event.Sku, @event.Qty);
         Product? product = await uow.Repository.GetAsync(line.Sku);
@@ -43,6 +54,6 @@ public class EventHandler(IEmailService emailService, IUnitOfWork uow) : IEventH
         
         string? batchRef = product.Allocate(line);
         await uow.CommitAsync();
-        // return batchRef;
+        return batchRef ?? string.Empty;
     }
 }

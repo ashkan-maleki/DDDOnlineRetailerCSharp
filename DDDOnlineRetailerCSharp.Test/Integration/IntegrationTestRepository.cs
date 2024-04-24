@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DDDOnlineRetailerCSharp.Test.Integration;
 
-public class IntegrationTestRepository(RepositoryFixture repositoryFixture, DataFixture dataFixture) : IClassFixture<RepositoryFixture>, IClassFixture<DataFixture>
+public class IntegrationTestRepository(EventFixture eventFixture, DataFixture dataFixture) : IClassFixture<EventFixture>, IClassFixture<DataFixture>
 {
     [Fact]
     public async Task TestRepositoryCanSaveAProduct()
@@ -17,17 +17,17 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
         Product product = new(sku, new List<Batch>() {batch});
         
 
-        await repositoryFixture.UnitOfWork.Repository.AddAsync(product: product);
-        await repositoryFixture.UnitOfWork.CommitAsync();
+        await eventFixture.UnitOfWork.Repository.AddAsync(product: product);
+        await eventFixture.UnitOfWork.CommitAsync();
 
-        Batch got = await repositoryFixture.DbContext.Batches.FromSql($"SELECT * FROM batches").FirstAsync();
+        Batch got = await eventFixture.DbContext.Batches.FromSql($"SELECT * FROM batches").FirstAsync();
         got.Should().Be(batch);
     }
 
     [Fact]
     public async Task TestRepositoryCanRetrieveABatchWithAllocations()
     {
-        RetailerDbContext dbContext = repositoryFixture.DbContext;
+        RetailerDbContext dbContext = eventFixture.DbContext;
 
         await dataFixture.InsertProduct(dbContext);
         string reference = "batch1";
@@ -36,7 +36,7 @@ public class IntegrationTestRepository(RepositoryFixture repositoryFixture, Data
         int orderLineId = await dataFixture.InsertOrderLine(dbContext);
         await dataFixture.InsertAllocation(dbContext,orderLineId, batch1Id);
 
-        Product? product = await repositoryFixture.UnitOfWork.Repository.GetAsync(dataFixture.GetSku);
+        Product? product = await eventFixture.UnitOfWork.Repository.GetAsync(dataFixture.GetSku);
         Batch got = product.Batches.First(batch => batch.Reference == reference);
         Batch expected = new(reference, dataFixture.GetSku, 100);
         List<OrderLine> expectedLine = new() { new("order1", dataFixture.GetSku, 12) };
