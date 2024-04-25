@@ -99,9 +99,8 @@ public static class MessageBusFactory
         MessageBus messageBus = new(uow);
         messageBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
         messageBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
+        
         messageBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
-        
-        
         messageBus.RegisterHandler<AllocationRequired>(handler.HandleAsync);
         return messageBus;
     }

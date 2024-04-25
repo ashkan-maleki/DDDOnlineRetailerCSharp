@@ -13,6 +13,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
     public ICollection<Batch> Batches { get; } = batches;
 
     // public List<Event> Events { get; init; } = new();
+    // TODO: Convert to Queue
     private readonly HashSet<Event> _events = new();
 
     public void AddEvent(Event @event) => _events.Add(@event);

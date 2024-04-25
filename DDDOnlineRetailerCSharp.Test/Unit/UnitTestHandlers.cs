@@ -81,6 +81,27 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         exception.Message.Should().Be("Invalid sku NONEXISTENTSKU");
     }
 
+    [Fact]
+    public async Task TestSendsEmailOnOutOfStockError()
+    {
+        await eventFixture.ResetDbContext();
+        string? reference = "b2";
+        string sku = "POPULAR-CURTAINS";
+        await eventFixture.MessageBus.HandleAsync(new BatchCreated(reference, sku, 9));
+        Queue<object> results =await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", sku, 10));
+        
+        Assert.NotNull(results);
+        results.Count.Should().Be(2);
+        results.Dequeue();
+        object result = results.Dequeue();
+        result.Should().BeOfType<string>();
+        if (result is string batchRef)
+        {
+            batchRef.Should().Be($"{sku} is ran out of stock");
+        }
+        
+    }
+
     // [Fact]
     // public async Task TestReturnsAllocation()
     // {
