@@ -55,7 +55,7 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         await eventFixture.MessageBus.HandleAsync(new BatchCreated(reference, sku, 100));
         Queue<object> results = await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", sku, 10));
 
-        
+
         Assert.NotNull(results);
         results.Count.Should().BeGreaterThan(0);
         object result = results.Dequeue();
@@ -65,7 +65,7 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
             batchRef.Should().Be(reference);
         }
     }
-    
+
     [Fact]
     public async Task TestAllocateThrowExceptionForInvalidSku()
     {
@@ -75,8 +75,10 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         string sku = "CRUNCHY-ARMCHAIR";
         await eventFixture.MessageBus.HandleAsync(new BatchCreated(reference, sku, 100));
 
-        
-        async Task Allocate() => await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", "NONEXISTENTSKU", 10));
+
+        async Task Allocate() =>
+            await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", "NONEXISTENTSKU", 10));
+
         InvalidSku exception = await Assert.ThrowsAsync<InvalidSku>(Allocate);
         exception.Message.Should().Be("Invalid sku NONEXISTENTSKU");
     }
@@ -88,8 +90,8 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         string? reference = "b2";
         string sku = "POPULAR-CURTAINS";
         await eventFixture.MessageBus.HandleAsync(new BatchCreated(reference, sku, 9));
-        Queue<object> results =await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", sku, 10));
-        
+        Queue<object> results = await eventFixture.MessageBus.HandleAsync(new AllocationRequired("o1", sku, 10));
+
         Assert.NotNull(results);
         results.Count.Should().Be(2);
         results.Dequeue();
@@ -99,32 +101,52 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         {
             batchRef.Should().Be($"{sku} is ran out of stock");
         }
-        
     }
 
-    // [Fact]
-    // public async Task TestReturnsAllocation()
-    // {
-    //     OrderLine line = new("order1", "COMPLICATED-LAMP", 12);
-    //     Batch batch = new("b1", "COMPLICATED-LAMP", 100);
-    //     await eventFixture.UnitOfWork.Repository.AddAsync(batch);
-    //     await eventFixture.UnitOfWork.CommitAsync();
-    //     BatchService service = new( eventFixture.UnitOfWork);
-    //     string result = await service.Allocate(line);
-    //     result.Should().Be("b1");
-    // }
-    //
-    // [Fact]
-    // public async Task TestErrorForInvalidSku()
-    // {
-    //     OrderLine line = new("o1", "NONEXISTENTSKU", 10);
-    //     Batch batch = new("b1", "AREALSKU", 100);
-    //     await eventFixture.UnitOfWork.Repository.AddAsync(batch);
-    //     await eventFixture.UnitOfWork.CommitAsync();
-    //     BatchService service = new(eventFixture.UnitOfWork);
-    //
-    //     async Task Allocate() => await service.Allocate(line);
-    //     InvalidSku exception = await Assert.ThrowsAsync<InvalidSku>(Allocate);
-    //     exception.Message.Should().Be("Invalid sku NONEXISTENTSKU");
-    // }
+    [Fact]
+    public async Task TestChangesAvailableQuantity()
+    {
+        await eventFixture.ResetDbContext();
+        string? reference = "batch1";
+        string sku = "ADORABLE-SETTEE";
+
+        await eventFixture.MessageBus.HandleAsync(new BatchCreated(reference, sku, 100));
+        Batch? batch = (await eventFixture.UnitOfWork.Repository.GetAsync(sku))?.Batches.FirstOrDefault();
+        Assert.NotNull(batch);
+        await eventFixture.MessageBus.HandleAsync(new BatchQuantityChanged(reference, 50));
+        batch.AvailableQuantity.Should().Be(50);
+    }
+
+    [Fact]
+    public async Task TestReallocatesIfNecessary()
+    {
+        await eventFixture.ResetDbContext();
+        string? reference1 = "batch1";
+        string? reference2 = "batch2";
+        string sku = "INDIFFERENT-TABLE";
+
+        List<Event> events =
+        [
+            new BatchCreated(reference1, sku, 50),
+            new BatchCreated(reference2, sku, 50, DateTime.Today),
+            new AllocationRequired("order1", sku, 20),
+            new AllocationRequired("order2", sku, 20),
+        ];
+
+        foreach (Event @event in events)
+        {
+            await eventFixture.MessageBus.HandleAsync(@event);
+        }
+
+        List<Batch>? batches = (await eventFixture.UnitOfWork.Repository.GetAsync(sku))?.Batches.ToList();
+        Assert.NotNull(batches);
+        batches.Count.Should().Be(2);
+        batches[0].AvailableQuantity.Should().Be(10);
+        batches[1].AvailableQuantity.Should().Be(50);
+        
+        await eventFixture.MessageBus.HandleAsync(new BatchQuantityChanged(reference1, 25));
+        
+        batches[0].AvailableQuantity.Should().Be(5);
+        batches[1].AvailableQuantity.Should().Be(30);
+    }
 }
