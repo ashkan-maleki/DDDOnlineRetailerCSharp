@@ -5,17 +5,10 @@ namespace DDDOnlineRetailerCSharp.Domain;
 public record Event
 {
     [JsonInclude]
-    public Guid Id { get; set; }
-    
-    [JsonInclude]
-    public DateTime CreationDate { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    public Event()
-    {
-        Id = Guid.NewGuid();
-        CreationDate = DateTime.UtcNow;
-    }
-    
+    [JsonInclude]
+    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 }
 
 public record OutOfStock(string Sku) : Event

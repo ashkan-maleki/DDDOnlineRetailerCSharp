@@ -1,19 +1,11 @@
 ﻿using DDDOnlineRetailerCSharp.Domain;
 using DDDOnlineRetailerCSharp.Link.Adaptors;
 
-namespace DDDOnlineRetailerCSharp.Link.Services;
-
-public interface IEventHandler
-{
-    public Task<object> HandleAsync(OutOfStock @event);
-    public Task HandleAsync(BatchCreated @event);
-    public Task HandleAsync(BatchQuantityChanged @event);
-    public Task<object> HandleAsync(AllocationRequired @event);
-}
+namespace DDDOnlineRetailerCSharp.Link.Services.Events;
 
 public class EventHandler(IEmailService emailService, IUnitOfWork uow) : IEventHandler
 {
-    public Task<object> HandleAsync(OutOfStock @event) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
+    public Task HandleAsync(OutOfStock @event) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
 
 
     public async Task HandleAsync(BatchCreated @event)
@@ -39,7 +31,7 @@ public class EventHandler(IEmailService emailService, IUnitOfWork uow) : IEventH
         }
     }
 
-    public async Task<object> HandleAsync(AllocationRequired @event)
+    public async Task HandleAsync(AllocationRequired @event)
     {
         OrderLine line = new(@event.OrderId, @event.Sku, @event.Qty);
         Product? product = await uow.Repository.GetAsync(line.Sku);
@@ -51,6 +43,5 @@ public class EventHandler(IEmailService emailService, IUnitOfWork uow) : IEventH
 
         string? batchRef = product.Allocate(line);
         await uow.CommitAsync();
-        return batchRef ?? string.Empty;
     }
 }
