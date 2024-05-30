@@ -1,10 +1,14 @@
 ﻿using DDDOnlineRetailerCSharp.Link;
 using DDDOnlineRetailerCSharp.Link.Adaptors;
 using DDDOnlineRetailerCSharp.Link.Services;
-using DDDOnlineRetailerCSharp.Link.Services.Events;
+using DDDOnlineRetailerCSharp.Link.Services.Commands;
+using DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 using DDDOnlineRetailerCSharp.Persistence;
+using DDDOnlineRetailerCSharp.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
-using EventHandler = DDDOnlineRetailerCSharp.Link.Services.Events.EventHandler;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DDDOnlineRetailerCSharp.Test.Fixtures;
 
@@ -12,12 +16,23 @@ public class EventFixture : IDisposable
 {
     public EventFixture()
     {
-        DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
         
+
+        var configuration = new ConfigurationBuilder().Build();
+        var serviceProvider = new ServiceCollection()
+            .AddLogging() // could also be part of AddEcho to make sure ILogger is available outside ASP.NET runtime
+            .AddDbContext<RetailerDbContext>(s => s.UseSqliteDatabaseOptionsBuilder())
+            .BuildServiceProvider();
+        // var sut = serviceProvider.GetRequiredService<IEchoService>();
+        
+        DbContext = serviceProvider.GetService<RetailerDbContext>();
+        // DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
         UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext));
         IEmailService emailService = new EmailService();
-        IEventHandler eventHandler = new EventHandler(emailService, UnitOfWork);
-        EventBus = EventBusFactory.RegisterAll(eventHandler, UnitOfWork);
+        CommandDispatcher =  CommandDispatcherFactory.RegisterAll(new CommandHandler(UnitOfWork));
+        
+        IDomainEventHandler domainEventHandler = new DomainEventHandler(emailService, UnitOfWork, new Logger<DomainEventHandler>(new LoggerFactory()));
+        DomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler, UnitOfWork);
     }
 
     public async Task ResetDbContext()
@@ -29,7 +44,9 @@ public class EventFixture : IDisposable
         DbContext.OrderLines.RemoveRange(DbContext.OrderLines);
         await DbContext.SaveChangesAsync();
     }
-    public IEventBus EventBus { get; }
+
+    public IDomainEventBus DomainEventBus { get; }
+    public ICommandDispatcher CommandDispatcher { get; }
     public RetailerDbContext DbContext { get; }
 
     public IUnitOfWork UnitOfWork { get; }

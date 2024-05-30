@@ -17,13 +17,13 @@ public class UnitOfWork(RetailerDbContext dbContext, IRepository repository) : I
 
     public async ValueTask DisposeAsync() => await dbContext.DisposeAsync();
 
-    public async IAsyncEnumerable<Task<Event>> CollectNewEvents()
+    public async IAsyncEnumerable<Task<DomainEvent>> CollectNewEvents()
     {
         foreach (Product product in repository.Seen)
         {
             while (product!.HasEvent())
             {
-                Event? @event = product.PopEvent();
+                DomainEvent? @event = product.PopEvent();
                 if (@event == null)
                 {
                     break;

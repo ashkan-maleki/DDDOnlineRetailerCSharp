@@ -1,11 +1,11 @@
 ﻿using DDDOnlineRetailerCSharp.Domain;
 
-namespace DDDOnlineRetailerCSharp.Link.Services.Events;
+namespace DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
 // IEventHandler
 
 // EventHandler
-public class EventBus(IUnitOfWork uow) : IEventBus
+public class IntegrationEventBus(IUnitOfWork uow) : IIntegrationEventBus
 {
     private readonly Dictionary<Type, Func<Event, Task>> _handlers = new();
 

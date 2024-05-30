@@ -14,9 +14,9 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
 
     // public List<Event> Events { get; init; } = new();
     // TODO: Convert to Queue
-    private readonly HashSet<Event> _events = new();
+    private readonly HashSet<DomainEvent> _events = new();
 
-    public void AddEvent(Event @event) => _events.Add(@event);
+    public void AddEvent(DomainEvent @event) => _events.Add(@event);
 
     public bool HasEvent() => _events.Any();
 
@@ -30,9 +30,9 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
         return false;
     }
 
-    public Event? PopEvent()
+    public DomainEvent? PopEvent()
     {
-        Event? @event = _events.FirstOrDefault();
+        DomainEvent? @event = _events.FirstOrDefault();
         if (@event == null)
         {
             return null;
@@ -70,7 +70,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
                 {
                     break;
                 }
-                _events.Add(new AllocationRequired(line.OrderId, line.Sku, line.Qty));
+                _events.Add(new Deallocated(line.OrderId, line.Sku, line.Qty));
             }
         }
     }

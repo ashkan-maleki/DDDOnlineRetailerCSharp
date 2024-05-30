@@ -1,11 +1,11 @@
 using DDDOnlineRetailerCSharp.Domain;
 
-namespace DDDOnlineRetailerCSharp.Link.Services.Events;
+namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
-public interface IEventHandler
+public interface IDomainEventHandler
 {
     public Task HandleAsync(OutOfStock @event);
     public Task HandleAsync(BatchCreated @event);
     public Task HandleAsync(BatchQuantityChanged @event);
-    public Task HandleAsync(AllocationRequired @event);
+    public Task HandleAsync(Deallocated @event);
 }

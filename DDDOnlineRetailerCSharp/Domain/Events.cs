@@ -11,7 +11,10 @@ public record Event
     public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 }
 
-public record OutOfStock(string Sku) : Event
+public record IntegrationEvent : Event;
+public record DomainEvent : Event;
+
+public record OutOfStock(string Sku) : DomainEvent
 {
     public string Sku { get; } = Sku;
 }
@@ -30,7 +33,7 @@ public record BatchQuantityChanged(string Reference, int Qty) : Event
     public int Qty { get; init; } = Qty;
 }
 
-public record AllocationRequired(string OrderId, string Sku, int Qty) : Event
+public record Deallocated(string OrderId, string Sku, int Qty) : DomainEvent
 {
     public string OrderId { get; init; } = OrderId;
     public string Sku { get; init; } = Sku;

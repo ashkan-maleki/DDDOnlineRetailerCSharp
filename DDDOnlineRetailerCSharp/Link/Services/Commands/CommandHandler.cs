@@ -3,7 +3,7 @@ using DDDOnlineRetailerCSharp.Link.Adaptors;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.Commands;
 
-public class CommandHandler(IEmailService emailService, IUnitOfWork uow) : ICommandHandler
+public class CommandHandler(IUnitOfWork uow) : ICommandHandler
 {
     public async Task HandleAsync(CreateBatch command)
     {
@@ -38,7 +38,7 @@ public class CommandHandler(IEmailService emailService, IUnitOfWork uow) : IComm
             throw new InvalidSku($"Invalid sku {line.Sku}");
         }
 
-        string? batchRef = product.Allocate(line);
+        _ = product.Allocate(line);
         await uow.CommitAsync();
     }
 }

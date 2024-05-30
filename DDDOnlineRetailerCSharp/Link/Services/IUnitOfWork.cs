@@ -8,5 +8,5 @@ public interface IUnitOfWork : IAsyncDisposable
     IRepository Repository { get; }
     int Commit();
     Task<int> CommitAsync(CancellationToken cancellationToken = default);
-    IAsyncEnumerable<Task<Event>> CollectNewEvents();
+    IAsyncEnumerable<Task<DomainEvent>> CollectNewEvents();
 }
