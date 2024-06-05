@@ -24,9 +24,9 @@ builder.Services.AddSingleton<ICommandDispatcher>(_ => commandDispatcher);
 
 IDomainEventHandler domainEventHandler = builder!.Services!.BuildServiceProvider()
     .GetRequiredService<IDomainEventHandler>();
-IUnitOfWork uow = builder!.Services!.BuildServiceProvider()
-    .GetRequiredService<IUnitOfWork>();
-DomainDomainEventBus domainDomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler, uow);
+// IUnitOfWork uow = builder!.Services!.BuildServiceProvider()
+//     .GetRequiredService<IUnitOfWork>();
+DomainDomainEventBus domainDomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
 builder.Services.AddSingleton<IDomainEventBus>(_ => domainDomainEventBus);
 
 var app = builder.Build();

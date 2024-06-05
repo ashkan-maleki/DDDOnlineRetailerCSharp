@@ -25,14 +25,19 @@ public class EventFixture : IDisposable
             .BuildServiceProvider();
         // var sut = serviceProvider.GetRequiredService<IEchoService>();
         
-        DbContext = serviceProvider.GetService<RetailerDbContext>();
-        // DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
-        UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext));
+        
         IEmailService emailService = new EmailService();
+        
+        DbContext = serviceProvider.GetService<RetailerDbContext>();
+        
+        IDomainEventHandler domainEventHandler = new DomainEventHandler(emailService, new Logger<DomainEventHandler>(new LoggerFactory()));
+        DomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
+        
+        // DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
+        UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext), DomainEventBus);
         CommandDispatcher =  CommandDispatcherFactory.RegisterAll(new CommandHandler(UnitOfWork));
         
-        IDomainEventHandler domainEventHandler = new DomainEventHandler(emailService, UnitOfWork, new Logger<DomainEventHandler>(new LoggerFactory()));
-        DomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler, UnitOfWork);
+        
     }
 
     public async Task ResetDbContext()

@@ -4,8 +4,8 @@ namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
 public interface IDomainEventBus
 {
-    void RegisterHandler<T>(Func<T, Task> handler) where T : DomainEvent;
-    Task HandleAsync(DomainEvent @event);
+    void RegisterHandler<T>(Func<T, IUnitOfWork, Task> handler) where T : DomainEvent;
+    Task HandleAsync(DomainEvent @event, IUnitOfWork uow);
 }
 
 // https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/generic-methods

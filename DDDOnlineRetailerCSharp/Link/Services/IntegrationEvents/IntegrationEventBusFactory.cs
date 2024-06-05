@@ -7,7 +7,7 @@ public static class IntegrationEventBusFactory
 {
     public static DomainDomainEventBus RegisterAll(IDomainEventHandler handler, IUnitOfWork uow)
     {
-        DomainDomainEventBus domainDomainEventBus = new(uow);
+        DomainDomainEventBus domainDomainEventBus = new();
         // domainDomainEventBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
         // domainDomainEventBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
         //

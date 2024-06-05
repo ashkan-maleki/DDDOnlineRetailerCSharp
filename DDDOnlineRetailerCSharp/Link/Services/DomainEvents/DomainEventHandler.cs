@@ -18,23 +18,23 @@ public interface IOutOfStockHandler : IGenericEventHandler<OutOfStock>
 }
 
 
-public class DomainEventHandler(IEmailService emailService, IUnitOfWork uow, ILogger<DomainEventHandler> logger) : IDomainEventHandler
+public class DomainEventHandler(IEmailService emailService, ILogger<DomainEventHandler> logger) : IDomainEventHandler
 {
-    public Task HandleAsync(OutOfStock @event) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
+    public Task HandleAsync(OutOfStock @event, IUnitOfWork uow) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
 
-    public async Task HandleAsync(BatchCreated @event)
+    public async Task HandleAsync(BatchCreated @event, IUnitOfWork uow)
     {
         logger.LogInformation("Publishing integration event: {EventID} - ({@EventType})", @event.Id, typeof(BatchCreated));
         await Task.FromResult(0);
     }
 
-    public async Task HandleAsync(BatchQuantityChanged @event)
+    public async Task HandleAsync(BatchQuantityChanged @event, IUnitOfWork uow)
     {
         logger.LogInformation("Publishing integration event: {EventID} - ({@EventType})", @event.Id, typeof(BatchQuantityChanged));
         await Task.FromResult(0);
     }
 
-    public async Task HandleAsync(Deallocated @event)
+    public async Task HandleAsync(Deallocated @event, IUnitOfWork uow)
     {
         OrderLine line = new(@event.OrderId, @event.Sku, @event.Qty);
         Product? product = await uow.Repository.GetAsync(line.Sku);

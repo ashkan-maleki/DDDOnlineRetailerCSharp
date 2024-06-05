@@ -19,7 +19,7 @@ public interface IOutOfStockHandler : IGenericEventHandler<OutOfStock>
 }
 
 
-public class IntegrationDomainEventHandler(IEmailService emailService, IUnitOfWork uow, ILogger<IntegrationDomainEventHandler> logger) : IDomainEventHandler
+public class IntegrationDomainEventHandler(IEmailService emailService, IUnitOfWork uow, ILogger<IntegrationDomainEventHandler> logger) : IIntegrationEventHandler
 {
     public Task HandleAsync(OutOfStock @event) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
 
