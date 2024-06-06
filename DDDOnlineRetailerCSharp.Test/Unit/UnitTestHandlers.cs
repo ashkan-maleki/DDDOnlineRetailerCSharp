@@ -2,8 +2,6 @@
 using DDDOnlineRetailerCSharp.Link.Services;
 using DDDOnlineRetailerCSharp.Test.Fixtures;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DDDOnlineRetailerCSharp.Test.Unit;
 
@@ -14,16 +12,14 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
     {
         await eventFixture.ResetDbContext();
         string? reference = "b1";
-
         string sku = "CRUNCHY-ARMCHAIR";
         await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch(reference, sku, 100));
-
 
         Product? got = await eventFixture.UnitOfWork.Repository.GetAsync(sku);
         Assert.NotNull(got);
         Assert.NotNull(got.Batches);
+        
         got.Batches.Count.Should().Be(1);
-
         got.Batches.First().Reference.Should().Be(reference);
     }
 
@@ -33,42 +29,34 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         await eventFixture.ResetDbContext();
         string? reference = "b2";
 
-        string sku = "CRUNCHY-ARMCHAIR";
+        string sku = "COMPLICATED-LAMP";
         await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch("b1", sku, 100));
         await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch(reference, sku, 99));
-
 
         Product? got = await eventFixture.UnitOfWork.Repository.GetAsync(sku);
         Assert.NotNull(got);
         Assert.NotNull(got.Batches);
-        var a = got.Batches;
+        
         got.Batches.Count.Should().Be(2);
-
         got.Batches.Last().Reference.Should().Be(reference);
     }
 
-    // [Fact]
-    // public async Task TestAllocateReturnsAllocation()
-    // {
-    //
-    //     
-    //     await eventFixture.ResetDbContext();
-    //     string? reference = "b2";
-    //
-    //     string sku = "CRUNCHY-ARMCHAIR";
-    //     await eventFixture.EventBus.HandleAsync(new BatchCreated(reference, sku, 100));
-    //     Queue<object> results = await eventFixture.EventBus.HandleAsync(new AllocationRequired("o1", sku, 10));
-    //
-    //
-    //     Assert.NotNull(results);
-    //     results.Count.Should().BeGreaterThan(0);
-    //     object result = results.Dequeue();
-    //     result.Should().BeOfType<string>();
-    //     if (result is string batchRef)
-    //     {
-    //         batchRef.Should().Be(reference);
-    //     }
-    // }
+    [Fact]
+    public async Task TestAllocate()
+    {
+        await eventFixture.ResetDbContext();
+        string? reference = "b2";
+    
+        string sku = "CRUNCHY-ARMCHAIR";
+        await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch(reference, sku, 100));
+        await eventFixture.CommandDispatcher.HandleAsync(new Allocate("o1", sku, 10));
+
+        Product? product = await eventFixture.UnitOfWork.Repository.GetAsync(sku);
+        product.Should().NotBeNull();
+        product!.Batches.Should().HaveCount(1);
+        Batch batch = product.Batches.FirstOrDefault()!;
+        batch.AvailableQuantity.Should().Be(90);
+    }
 
     [Fact]
     public async Task TestAllocateThrowExceptionForInvalidSku()
@@ -87,25 +75,16 @@ public class UnitTestHandlers(EventFixture eventFixture) : IClassFixture<EventFi
         exception.Message.Should().Be("Invalid sku NONEXISTENTSKU");
     }
 
-    // [Fact]
-    // public async Task TestSendsEmailOnOutOfStockError()
-    // {
-    //     await eventFixture.ResetDbContext();
-    //     string? reference = "b2";
-    //     string sku = "POPULAR-CURTAINS";
-    //     await eventFixture.EventBus.HandleAsync(new BatchCreated(reference, sku, 9));
-    //     Queue<object> results = await eventFixture.EventBus.HandleAsync(new AllocationRequired("o1", sku, 10));
-    //
-    //     Assert.NotNull(results);
-    //     results.Count.Should().Be(2);
-    //     results.Dequeue();
-    //     object result = results.Dequeue();
-    //     result.Should().BeOfType<string>();
-    //     if (result is string batchRef)
-    //     {
-    //         batchRef.Should().Be($"{sku} is ran out of stock");
-    //     }
-    // }
+    [Fact]
+    public async Task TestSendsEmailOnOutOfStockError()
+    {
+        await eventFixture.ResetDbContext();
+        string? reference = "b2";
+        string sku = "POPULAR-CURTAINS";
+        await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch(reference, sku, 9));
+        await eventFixture.CommandDispatcher.HandleAsync(new Allocate("o1", sku, 10));
+        eventFixture.EmailService.Sent("admin@eshop.com").Should().BeTrue();
+    }
 
     [Fact]
     public async Task TestChangesAvailableQuantity()

@@ -2,14 +2,19 @@
 
 public interface IEmailService
 {
-    string Send(string message);
+    bool Sent(string email);
+    void Send(string email, string message);
 }
 
 public class EmailService : IEmailService
 {
-    public string Send(string message)
+    private Dictionary<string, string> _logs { get; } = new();
+
+    public bool Sent(string email) => _logs.ContainsKey(email);
+
+    public void Send(string email, string message)
     {
+        _logs.Add(email, message);
         Console.WriteLine(message);
-        return message;
     }
 }

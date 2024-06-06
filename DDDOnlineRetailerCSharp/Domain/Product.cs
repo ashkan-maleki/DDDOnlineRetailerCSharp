@@ -12,6 +12,8 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
 
     public ICollection<Batch> Batches { get; } = batches;
 
+    public HashSet<DomainEvent> Events() => _events;
+
     // public List<Event> Events { get; init; } = new();
     // TODO: Convert to Queue
     private readonly HashSet<DomainEvent> _events = new();

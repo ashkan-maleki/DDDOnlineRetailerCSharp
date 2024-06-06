@@ -20,7 +20,11 @@ public interface IOutOfStockHandler : IGenericEventHandler<OutOfStock>
 
 public class DomainEventHandler(IEmailService emailService, ILogger<DomainEventHandler> logger) : IDomainEventHandler
 {
-    public Task HandleAsync(OutOfStock @event, IUnitOfWork uow) => Task.FromResult((object)emailService.Send($"{@event.Sku} is ran out of stock"));
+    public Task HandleAsync(OutOfStock @event, IUnitOfWork uow)
+    {
+        emailService.Send("admin@eshop.com", $"{@event.Sku} is ran out of stock");
+        return Task.FromResult(0);
+    }
 
     public async Task HandleAsync(BatchCreated @event, IUnitOfWork uow)
     {

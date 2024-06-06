@@ -26,11 +26,11 @@ public class EventFixture : IDisposable
         // var sut = serviceProvider.GetRequiredService<IEchoService>();
         
         
-        IEmailService emailService = new EmailService();
+        EmailService = new EmailService();
         
         DbContext = serviceProvider.GetService<RetailerDbContext>();
         
-        IDomainEventHandler domainEventHandler = new DomainEventHandler(emailService, new Logger<DomainEventHandler>(new LoggerFactory()));
+        IDomainEventHandler domainEventHandler = new DomainEventHandler(EmailService, new Logger<DomainEventHandler>(new LoggerFactory()));
         DomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
         
         // DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
@@ -50,6 +50,7 @@ public class EventFixture : IDisposable
         await DbContext.SaveChangesAsync();
     }
 
+    public IEmailService EmailService { get; }
     public IDomainEventBus DomainEventBus { get; }
     public ICommandDispatcher CommandDispatcher { get; }
     public RetailerDbContext DbContext { get; }

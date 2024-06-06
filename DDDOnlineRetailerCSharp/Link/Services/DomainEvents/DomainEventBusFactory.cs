@@ -10,7 +10,7 @@ public static class DomainEventBusFactory
         // domainDomainEventBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
         // domainDomainEventBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
         //
-        // domainDomainEventBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
+        domainDomainEventBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
         domainDomainEventBus.RegisterHandler<Deallocated>(handler.HandleAsync);
         return domainDomainEventBus;
     }
