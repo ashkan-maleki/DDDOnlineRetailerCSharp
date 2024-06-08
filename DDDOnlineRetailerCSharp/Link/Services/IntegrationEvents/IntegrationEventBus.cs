@@ -1,11 +1,12 @@
 ﻿using DDDOnlineRetailerCSharp.Domain;
+using DDDOnlineRetailerCSharp.EventBus;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
 // IEventHandler
 
 // EventHandler
-public class IntegrationEventBus(IUnitOfWork uow) : IIntegrationEventBus
+public class IntegrationEventBus() : IIntegrationEventBus
 {
     private readonly Dictionary<Type, Func<Event, Task>> _handlers = new();
 
@@ -21,23 +22,13 @@ public class IntegrationEventBus(IUnitOfWork uow) : IIntegrationEventBus
 
     public async Task HandleAsync(Event @event)
     {
-        Queue<Event> events = new Queue<Event>(new[] { @event });
-        while (events.Any())
+        if (_handlers.TryGetValue(@event.GetType(), out Func<Event, Task>? handler))
         {
-            @event = events.Dequeue();
-            if (_handlers.TryGetValue(@event.GetType(), out Func<Event, Task>? handler))
-            {
-                await handler(@event);
-
-                await foreach (var collectedEvent in uow.CollectNewEvents())
-                {
-                    events.Enqueue(collectedEvent.Result);
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(handler), "No event handler was registered");
-            }
+            await handler(@event);
+        }
+        else
+        {
+            throw new ArgumentNullException(nameof(handler), "No event handler was registered");
         }
     }
 }

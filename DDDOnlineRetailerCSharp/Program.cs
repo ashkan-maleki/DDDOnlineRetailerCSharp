@@ -26,8 +26,8 @@ IDomainEventHandler domainEventHandler = builder!.Services!.BuildServiceProvider
     .GetRequiredService<IDomainEventHandler>();
 // IUnitOfWork uow = builder!.Services!.BuildServiceProvider()
 //     .GetRequiredService<IUnitOfWork>();
-DomainDomainEventBus domainDomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
-builder.Services.AddSingleton<IDomainEventBus>(_ => domainDomainEventBus);
+DomainEventBus domainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
+builder.Services.AddSingleton<IDomainEventBus>(_ => domainEventBus);
 
 var app = builder.Build();
 

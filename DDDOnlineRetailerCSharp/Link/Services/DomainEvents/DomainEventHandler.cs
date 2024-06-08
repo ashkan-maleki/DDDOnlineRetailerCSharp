@@ -1,5 +1,8 @@
-﻿using DDDOnlineRetailerCSharp.Domain;
+﻿using DDDOnlineRetailerCSharp.Application;
+using DDDOnlineRetailerCSharp.Domain;
+using DDDOnlineRetailerCSharp.EventBus;
 using DDDOnlineRetailerCSharp.Link.Adaptors;
+using DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
@@ -10,19 +13,20 @@ public interface IGenericEventHandler<in TEvent> where TEvent : Event
 }
 
 
-public interface IOutOfStockHandler : IGenericEventHandler<OutOfStock>
+public interface IOutOfStockHandler : IGenericEventHandler<OutOfStockDomainEvent>
 {
-    new Task HandleAsync(OutOfStock @event);
-    Task IGenericEventHandler<OutOfStock>.HandleAsync(OutOfStock @event) => HandleAsync(@event);
+    new Task HandleAsync(OutOfStockDomainEvent @event);
+    Task IGenericEventHandler<OutOfStockDomainEvent>.HandleAsync(OutOfStockDomainEvent @event) => HandleAsync(@event);
 
 }
 
 
-public class DomainEventHandler(IEmailService emailService, ILogger<DomainEventHandler> logger) : IDomainEventHandler
+public class DomainEventHandler(IIntegrationEventBus eventBus, ILogger<DomainEventHandler> logger) : IDomainEventHandler
 {
-    public Task HandleAsync(OutOfStock @event, IUnitOfWork uow)
+    public Task HandleAsync(OutOfStockDomainEvent @event, IUnitOfWork uow)
     {
-        emailService.Send("admin@eshop.com", $"{@event.Sku} is ran out of stock");
+        OutOfStockIntegrationEvent integrationEvent = new(@event.Sku);
+        eventBus.HandleAsync(integrationEvent);
         return Task.FromResult(0);
     }
 

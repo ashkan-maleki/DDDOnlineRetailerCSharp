@@ -24,7 +24,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
 
     public bool HasOutOfStockEvent(string sku)
     {
-        if (_events.LastOrDefault() is OutOfStock outOfStock)
+        if (_events.LastOrDefault() is OutOfStockDomainEvent outOfStock)
         {
             return outOfStock.Sku == sku;
         }
@@ -50,7 +50,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
         Batch? batch = Batches.Order().FirstOrDefault(b => b.CanAllocate(line));
         if (batch == null)
         {
-            _events!.Add(new OutOfStock(line.Sku));
+            _events!.Add(new OutOfStockDomainEvent(line.Sku));
             return null;
         }
 

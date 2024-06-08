@@ -4,14 +4,14 @@ namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
 public static class DomainEventBusFactory
 {
-    public static DomainDomainEventBus RegisterAll(IDomainEventHandler handler)
+    public static DomainEventBus RegisterAll(IDomainEventHandler handler)
     {
-        DomainDomainEventBus domainDomainEventBus = new();
+        DomainEventBus domainEventBus = new();
         // domainDomainEventBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
         // domainDomainEventBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
         //
-        domainDomainEventBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
-        domainDomainEventBus.RegisterHandler<Deallocated>(handler.HandleAsync);
-        return domainDomainEventBus;
+        domainEventBus.RegisterHandler<OutOfStockDomainEvent>(handler.HandleAsync);
+        domainEventBus.RegisterHandler<Deallocated>(handler.HandleAsync);
+        return domainEventBus;
     }
 }

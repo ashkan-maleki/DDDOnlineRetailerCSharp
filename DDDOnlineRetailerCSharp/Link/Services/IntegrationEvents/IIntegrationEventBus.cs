@@ -1,4 +1,5 @@
 using DDDOnlineRetailerCSharp.Domain;
+using DDDOnlineRetailerCSharp.EventBus;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 

@@ -5,7 +5,7 @@ namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 // IEventHandler
 
 // EventHandler
-public class DomainDomainEventBus : IDomainEventBus
+public class DomainEventBus : IDomainEventBus
 {
     private readonly Dictionary<Type, Func<DomainEvent, IUnitOfWork, Task>> _handlers = new();
 

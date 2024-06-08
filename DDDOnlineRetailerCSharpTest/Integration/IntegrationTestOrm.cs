@@ -63,6 +63,8 @@ public class IntegrationTestOrm
         RetailerDbContext dbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
         
         await dbContext.Database.ExecuteSqlAsync($@"
+             INSERT INTO products (sku, versionnumber) VALUES ('sku1', 1);
+             INSERT INTO products (sku, versionnumber) VALUES ('sku2', 1);
              INSERT INTO batches (reference, sku, purchasedquantity, eta)
              VALUES ('batch1', 'sku1', 100, null);
              INSERT INTO batches (reference, sku, purchasedquantity, eta)

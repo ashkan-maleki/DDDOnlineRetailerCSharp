@@ -1,3 +1,4 @@
+using DDDOnlineRetailerCSharp.Application;
 using DDDOnlineRetailerCSharp.Domain;
 using DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
@@ -5,14 +6,10 @@ namespace DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
 public static class IntegrationEventBusFactory
 {
-    public static DomainDomainEventBus RegisterAll(IDomainEventHandler handler, IUnitOfWork uow)
+    public static IntegrationEventBus RegisterAll(IIntegrationEventHandler handler)
     {
-        DomainDomainEventBus domainDomainEventBus = new();
-        // domainDomainEventBus.RegisterHandler<BatchCreated>(handler.HandleAsync);
-        // domainDomainEventBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
-        //
-        // domainDomainEventBus.RegisterHandler<OutOfStock>(handler.HandleAsync);
-        // domainDomainEventBus.RegisterHandler<Deallocated>(handler.HandleAsync);
-        return domainDomainEventBus;
+        IntegrationEventBus integrationEventBus = new();
+        integrationEventBus.RegisterHandler<OutOfStockIntegrationEvent>(handler.HandleAsync);
+        return integrationEventBus;
     }
 }

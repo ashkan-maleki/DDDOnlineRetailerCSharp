@@ -3,6 +3,7 @@ using DDDOnlineRetailerCSharp.Link.Adaptors;
 using DDDOnlineRetailerCSharp.Link.Services;
 using DDDOnlineRetailerCSharp.Link.Services.Commands;
 using DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
+using DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 using DDDOnlineRetailerCSharp.Persistence;
 using DDDOnlineRetailerCSharp.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +31,13 @@ public class EventFixture : IDisposable
         
         DbContext = serviceProvider.GetService<RetailerDbContext>();
         
-        IDomainEventHandler domainEventHandler = new DomainEventHandler(EmailService, new Logger<DomainEventHandler>(new LoggerFactory()));
+        IIntegrationEventHandler integrationEventHandler = new IntegrationEventHandler(EmailService);
+        IntegrationEventBus = IntegrationEventBusFactory.RegisterAll(integrationEventHandler);
+        
+        IDomainEventHandler domainEventHandler = new DomainEventHandler(IntegrationEventBus, new Logger<DomainEventHandler>(new LoggerFactory()));
         DomainEventBus = DomainEventBusFactory.RegisterAll(domainEventHandler);
+        
+        
         
         // DbContext = RetailerDbContext.CreateSqliteRetailerDbContext();
         UnitOfWork = new UnitOfWork(DbContext, new Repository(DbContext), DomainEventBus);
@@ -52,6 +58,7 @@ public class EventFixture : IDisposable
 
     public IEmailService EmailService { get; }
     public IDomainEventBus DomainEventBus { get; }
+    public IIntegrationEventBus IntegrationEventBus { get; }
     public ICommandDispatcher CommandDispatcher { get; }
     public RetailerDbContext DbContext { get; }
 
