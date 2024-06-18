@@ -8,7 +8,7 @@ public class AllocationViewTypeConfiguration : IEntityTypeConfiguration<Allocati
 {
     public void Configure(EntityTypeBuilder<AllocationView> builder)
     {
-        builder.ToTable("allocations_view");
+        builder.ToTable("allocations_view").HasKey(b => new { b.OrderId, b.BatchRef, b.Sku });
 
         builder.Property<string>(b => b.OrderId!)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
@@ -21,7 +21,7 @@ public class AllocationViewTypeConfiguration : IEntityTypeConfiguration<Allocati
 
         builder.Property<string?>(b => b.BatchRef)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
-            .IsRequired(false);
+            .IsRequired();
 
     }
 
