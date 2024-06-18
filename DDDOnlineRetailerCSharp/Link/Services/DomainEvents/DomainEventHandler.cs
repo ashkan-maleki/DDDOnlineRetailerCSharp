@@ -27,22 +27,23 @@ public class DomainEventHandler(IIntegrationEventBus eventBus, ILogger<DomainEve
     {
         OutOfStockIntegrationEvent integrationEvent = new(@event.Sku);
         eventBus.HandleAsync(integrationEvent);
+        logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(OutOfStockDomainEvent));
         return Task.FromResult(0);
     }
 
-    public async Task HandleAsync(BatchCreated @event, IUnitOfWork uow)
+    public async Task HandleAsync(BatchCreatedDomainEvent @event, IUnitOfWork uow)
     {
-        logger.LogInformation("Publishing integration event: {EventID} - ({@EventType})", @event.Id, typeof(BatchCreated));
+        logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(BatchCreatedDomainEvent));
         await Task.FromResult(0);
     }
 
-    public async Task HandleAsync(BatchQuantityChanged @event, IUnitOfWork uow)
+    public async Task HandleAsync(BatchQuantityChangedDomainEvent @event, IUnitOfWork uow)
     {
-        logger.LogInformation("Publishing integration event: {EventID} - ({@EventType})", @event.Id, typeof(BatchQuantityChanged));
+        logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(BatchQuantityChangedDomainEvent));
         await Task.FromResult(0);
     }
 
-    public async Task HandleAsync(Deallocated @event, IUnitOfWork uow)
+    public async Task HandleAsync(DeallocatedDomainEvent @event, IUnitOfWork uow)
     {
         OrderLine line = new(@event.OrderId, @event.Sku, @event.Qty);
         Product? product = await uow.Repository.GetAsync(line.Sku);
@@ -54,6 +55,16 @@ public class DomainEventHandler(IIntegrationEventBus eventBus, ILogger<DomainEve
 
         _ = product.Allocate(line);
         await uow.CommitAsync();
-        logger.LogInformation("Publishing integration event: {EventID} - ({@EventType})", @event.Id, typeof(Deallocated));
+        DeallocatedIntegrationEvent deallocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Qty);
+        await eventBus.HandleAsync(deallocatedIntegrationEvent);
+        logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(DeallocatedDomainEvent));
+    }
+
+    public async Task HandleAsync(AllocatedDomainEvent @event, IUnitOfWork uow)
+    {
+        AllocatedIntegrationEvent allocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Qty, @event.Reference);
+        await eventBus.HandleAsync(allocatedIntegrationEvent);
+       
+        logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(AllocatedDomainEvent));
     }
 }

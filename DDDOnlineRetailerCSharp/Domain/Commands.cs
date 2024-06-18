@@ -15,3 +15,5 @@ public record CreateBatch(string Reference, string Sku, int Qty, DateTime? Eta =
 public record ChangeBatchQuantity(string Reference, int Qty) : Command;
 
 public record Allocate(string OrderId, string Sku, int Qty) : Command;
+
+

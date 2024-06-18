@@ -72,7 +72,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
                 {
                     break;
                 }
-                _events.Add(new Deallocated(line.OrderId, line.Sku, line.Qty));
+                _events.Add(new DeallocatedDomainEvent(line.OrderId, line.Sku, line.Qty));
             }
         }
     }

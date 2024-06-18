@@ -31,7 +31,7 @@ public class EventFixture : IDisposable
         
         DbContext = serviceProvider.GetService<RetailerDbContext>();
         
-        IIntegrationEventHandler integrationEventHandler = new IntegrationEventHandler(EmailService);
+        IIntegrationEventHandler integrationEventHandler = new IntegrationEventHandler(EmailService, DbContext);
         IntegrationEventBus = IntegrationEventBusFactory.RegisterAll(integrationEventHandler);
         
         IDomainEventHandler domainEventHandler = new DomainEventHandler(IntegrationEventBus, new Logger<DomainEventHandler>(new LoggerFactory()));

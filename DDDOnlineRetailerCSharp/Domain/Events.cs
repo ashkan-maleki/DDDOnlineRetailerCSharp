@@ -12,8 +12,10 @@ public record OutOfStockDomainEvent(string Sku) : DomainEvent
     public string Sku { get; } = Sku;
 }
 
-public record BatchCreated(string Reference, string Sku, int Qty, DateTime? Eta = null) : Event;
+public record BatchCreatedDomainEvent(string Reference, string Sku, int Qty, DateTime? Eta = null) : DomainEvent;
 
-public record BatchQuantityChanged(string Reference, int Qty) : Event;
+public record BatchQuantityChangedDomainEvent(string Reference, int Qty) : DomainEvent;
 
-public record Deallocated(string OrderId, string Sku, int Qty) : DomainEvent;
+public record DeallocatedDomainEvent(string OrderId, string Sku, int Qty) : DomainEvent;
+
+public record AllocatedDomainEvent(string OrderId, string Sku, int Qty, string Reference) : DomainEvent;

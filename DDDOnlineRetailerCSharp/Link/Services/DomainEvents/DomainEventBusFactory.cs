@@ -11,7 +11,7 @@ public static class DomainEventBusFactory
         // domainDomainEventBus.RegisterHandler<BatchQuantityChanged>(handler.HandleAsync);
         //
         domainEventBus.RegisterHandler<OutOfStockDomainEvent>(handler.HandleAsync);
-        domainEventBus.RegisterHandler<Deallocated>(handler.HandleAsync);
+        domainEventBus.RegisterHandler<DeallocatedDomainEvent>(handler.HandleAsync);
         return domainEventBus;
     }
 }

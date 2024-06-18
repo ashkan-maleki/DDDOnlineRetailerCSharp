@@ -40,10 +40,12 @@ public class RetailerDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BatchEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new OrderLineEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ProductEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new AllocationViewTypeConfiguration());
     }
 
     public DbSet<Batch> Batches { get; set; }
     public DbSet<OrderLine> OrderLines { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<AllocationView> Allocations { get; set; }
 
 }
