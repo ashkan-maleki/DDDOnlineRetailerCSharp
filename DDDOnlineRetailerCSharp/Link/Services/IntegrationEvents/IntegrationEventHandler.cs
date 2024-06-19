@@ -19,11 +19,12 @@ public interface IOutOfStockHandler : IGenericEventHandler<OutOfStockIntegration
         HandleAsync(@event);
 }
 
-public class IntegrationEventHandler(IEmailService emailService, RetailerDbContext dbContext) : IIntegrationEventHandler
+public class IntegrationEventHandler(IEmailService emailService, RetailerDbContext dbContext, ILogger<IntegrationEventHandler> logger) : IIntegrationEventHandler
 {
     public Task HandleAsync(OutOfStockIntegrationEvent @event)
     {
         emailService.Send("admin@eshop.com", $"{@event.Sku} is ran out of stock");
+        logger.LogInformation("Published integration event: {EventID} - ({@EventType})", @event.Id, typeof(OutOfStockIntegrationEvent));
         return Task.FromResult(0);
     }
 
@@ -32,6 +33,7 @@ public class IntegrationEventHandler(IEmailService emailService, RetailerDbConte
         dbContext.Allocations.RemoveRange(dbContext.Allocations.Where(allocation =>
             allocation.Sku == @event.Sku && allocation.OrderId == @event.OrderId));
         await dbContext.SaveChangesAsync();
+        logger.LogInformation("Published integration event: {EventID} - ({@EventType})", @event.Id, typeof(DeallocatedIntegrationEvent));
     }
 
 
@@ -39,5 +41,6 @@ public class IntegrationEventHandler(IEmailService emailService, RetailerDbConte
     {
         await dbContext.Allocations.AddAsync(new AllocationView(@event.Sku, @event.OrderId, @event.Reference));
         await dbContext.SaveChangesAsync();
+        logger.LogInformation("Published integration event: {EventID} - ({@EventType})", @event.Id, typeof(AllocatedIntegrationEvent));
     }
 }

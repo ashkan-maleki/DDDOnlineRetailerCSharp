@@ -1,6 +1,4 @@
 using DDDOnlineRetailerCSharp.Application;
-using DDDOnlineRetailerCSharp.Domain;
-using DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
