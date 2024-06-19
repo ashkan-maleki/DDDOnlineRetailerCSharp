@@ -10,6 +10,8 @@ public static class IntegrationEventBusFactory
     {
         IntegrationEventBus integrationEventBus = new();
         integrationEventBus.RegisterHandler<OutOfStockIntegrationEvent>(handler.HandleAsync);
+        integrationEventBus.RegisterHandler<AllocatedIntegrationEvent>(handler.HandleAsync);
+        integrationEventBus.RegisterHandler<DeallocatedIntegrationEvent>(handler.HandleAsync);
         return integrationEventBus;
     }
 }
