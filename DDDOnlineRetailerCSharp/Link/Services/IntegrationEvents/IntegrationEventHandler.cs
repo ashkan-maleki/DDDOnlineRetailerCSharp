@@ -30,8 +30,8 @@ public class IntegrationEventHandler(IEmailService emailService, RetailerDbConte
 
     public async Task HandleAsync(DeallocatedIntegrationEvent @event)
     {
-        dbContext.Allocations.RemoveRange(dbContext.Allocations.Where(allocation =>
-            allocation.Sku == @event.Sku && allocation.OrderId == @event.OrderId));
+        dbContext.Allocations.RemoveRange(dbContext.Allocations.Where(
+            allocation => allocation.Sku == @event.Sku && allocation.OrderId == @event.OrderId));
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Published integration event: {EventID} - ({@EventType})", @event.Id, typeof(DeallocatedIntegrationEvent));
     }

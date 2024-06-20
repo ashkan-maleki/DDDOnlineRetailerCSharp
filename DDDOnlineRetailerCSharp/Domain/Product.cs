@@ -56,6 +56,7 @@ public class Product(string sku, ICollection<Batch> batches, int versionNumber =
 
         batch!.Allocate(line);
         VersionNumber++;
+        _events!.Add(new AllocatedDomainEvent(line.OrderId, line.Sku, line.Qty, batch.Reference!));
         return batch.Reference!;
     }
 

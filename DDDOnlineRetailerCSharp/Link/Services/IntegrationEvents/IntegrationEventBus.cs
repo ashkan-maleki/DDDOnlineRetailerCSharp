@@ -28,7 +28,7 @@ public class IntegrationEventBus() : IIntegrationEventBus
         }
         else
         {
-            throw new ArgumentNullException(nameof(handler), "No event handler was registered");
+            throw new ArgumentNullException(@event.GetType().ToString(), "No event handler was registered");
         }
     }
 }

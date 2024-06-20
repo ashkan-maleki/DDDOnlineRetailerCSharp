@@ -1,7 +1,6 @@
 ﻿using DDDOnlineRetailerCSharp.Application;
 using DDDOnlineRetailerCSharp.Domain;
 using DDDOnlineRetailerCSharp.EventBus;
-using DDDOnlineRetailerCSharp.Link.Adaptors;
 using DDDOnlineRetailerCSharp.Link.Services.IntegrationEvents;
 
 namespace DDDOnlineRetailerCSharp.Link.Services.DomainEvents;
@@ -64,7 +63,6 @@ public class DomainEventHandler(IIntegrationEventBus eventBus, ILogger<DomainEve
     {
         AllocatedIntegrationEvent allocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Qty, @event.Reference);
         await eventBus.HandleAsync(allocatedIntegrationEvent);
-       
         logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(AllocatedDomainEvent));
     }
 }
