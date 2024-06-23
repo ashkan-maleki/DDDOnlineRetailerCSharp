@@ -54,14 +54,14 @@ public class DomainEventHandler(IIntegrationEventBus eventBus, ILogger<DomainEve
 
         _ = product.Allocate(line);
         await uow.CommitAsync();
-        DeallocatedIntegrationEvent deallocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Qty);
+        DeallocatedIntegrationEvent deallocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Reference);
         await eventBus.HandleAsync(deallocatedIntegrationEvent);
         logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(DeallocatedDomainEvent));
     }
 
     public async Task HandleAsync(AllocatedDomainEvent @event, IUnitOfWork uow)
     {
-        AllocatedIntegrationEvent allocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Qty, @event.Reference);
+        AllocatedIntegrationEvent allocatedIntegrationEvent = new(@event.OrderId, @event.Sku, @event.Reference);
         await eventBus.HandleAsync(allocatedIntegrationEvent);
         logger.LogInformation("Published domain event: {EventID} - ({@EventType})", @event.Id, typeof(AllocatedDomainEvent));
     }

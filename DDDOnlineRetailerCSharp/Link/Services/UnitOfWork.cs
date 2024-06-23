@@ -21,8 +21,9 @@ public class UnitOfWork(RetailerDbContext dbContext, IRepository repository, IDo
 
     public async IAsyncEnumerable<Task<DomainEvent>> CollectNewEvents()
     {
-        foreach (Product product in repository.Seen)
+        foreach (KeyValuePair<string, Product> pair in repository.Seen)
         {
+            var product = pair.Value;
             while (product!.HasEvent())
             {
                 DomainEvent? @event = product.PopEvent();
@@ -39,8 +40,9 @@ public class UnitOfWork(RetailerDbContext dbContext, IRepository repository, IDo
     public async Task<IEnumerable<DomainEvent>> CollectEvents()
     {
         List<DomainEvent> list = new();
-        foreach (Product product in repository.Seen)
+        foreach (KeyValuePair<string, Product> pair in repository.Seen)
         {
+            var product = pair.Value;
             while (product!.HasEvent())
             {
                 DomainEvent? @event = product.PopEvent();

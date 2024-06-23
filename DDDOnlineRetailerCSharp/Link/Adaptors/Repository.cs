@@ -6,12 +6,13 @@ namespace DDDOnlineRetailerCSharp.Link.Adaptors;
 
 public class Repository(RetailerDbContext dbContext) : IRepository
 {
-    public ICollection<Product> Seen { get; } = new List<Product>();
+    public Dictionary<string, Product> Seen { get; } = new();
 
     public async Task AddAsync(Product product)
     {
         await dbContext.Products.AddAsync(product);
-        Seen.Add(product);
+        AddProductAsSeen(product);
+        // Seen.Add(product);
     }
 
     public async Task<Product?> GetAsync(string sku)
@@ -22,7 +23,7 @@ public class Repository(RetailerDbContext dbContext) : IRepository
             .FirstOrDefaultAsync(product => product.Sku == sku);
         if (product != null)
         {
-            Seen.Add(product);
+            AddProductAsSeen(product);
         }
         return product;
     }
@@ -36,9 +37,11 @@ public class Repository(RetailerDbContext dbContext) : IRepository
             .FirstOrDefaultAsync();
         if (product != null)
         {
-            Seen.Add(product);
+            AddProductAsSeen(product);
         }
 
         return product;
     }
+
+    private void AddProductAsSeen(Product product) => Seen[product.Sku] = product;
 }

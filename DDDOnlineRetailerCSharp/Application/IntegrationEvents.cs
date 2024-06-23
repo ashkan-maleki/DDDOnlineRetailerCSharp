@@ -11,8 +11,8 @@ public record OutOfStockIntegrationEvent(string Sku) : IntegrationEvent
 }
 
 // RemoveAllocationFromViewIntegrationEvent
-public record DeallocatedIntegrationEvent(string OrderId, string Sku, int Qty) : IntegrationEvent;
+public record DeallocatedIntegrationEvent(string OrderId, string Sku, string Reference) : IntegrationEvent;
 
 
 // AddAllocationToViewIntegrationEvent
-public record AllocatedIntegrationEvent(string OrderId, string Sku, int Qty, string Reference) : IntegrationEvent;
+public record AllocatedIntegrationEvent(string OrderId, string Sku, string Reference) : IntegrationEvent;

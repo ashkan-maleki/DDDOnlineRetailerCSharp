@@ -33,7 +33,7 @@ public class IntegrationTestAllocationsView(EventFixture eventFixture) : IClassF
     public async Task TestDeallocation()
     {
         await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch("b1", "sku1", 50));
-        await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch("b2", "sku2", 50, DateTime.Now));
+        await eventFixture.CommandDispatcher.HandleAsync(new CreateBatch("b2", "sku1", 50, DateTime.Now));
         
         await eventFixture.CommandDispatcher.HandleAsync(new Allocate("o1", "sku1", 40));
         
@@ -42,6 +42,6 @@ public class IntegrationTestAllocationsView(EventFixture eventFixture) : IClassF
 
         List<AllocationView> allocated = await eventFixture.DbContext.Allocations.Where(allocate => allocate.OrderId == "o1").ToListAsync();
         allocated.Should().HaveCount(1);
-        allocated.Exists(al => al.Sku == "sku1" && al.BatchRef == "b1").Should().BeTrue();
+        allocated.Exists(al => al.Sku == "sku1" && al.BatchRef == "b2").Should().BeTrue();
     }
 }
