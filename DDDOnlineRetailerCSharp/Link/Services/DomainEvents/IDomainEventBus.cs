@@ -8,6 +8,7 @@ public interface IDomainEventBus
     Task HandleAsync(DomainEvent @event, IUnitOfWork uow);
 }
 
+// TODO
 // https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/generic-methods
 // https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/generic-interfaces
 // https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/rabbitmq-event-bus-development-test-environment?source=recommendations
